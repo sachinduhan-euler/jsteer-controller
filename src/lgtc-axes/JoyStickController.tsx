@@ -2,7 +2,11 @@ import React, { useLayoutEffect, useState } from "react";
 import RenderIf from "../util/RenderIf";
 import { VechicleMovement, JoyControllerMainPros } from "./types";
 
-function JoyStickController(): JSX.Element {
+type JoyStickControllerProps = {
+  isHandStickActive: boolean
+}
+
+function JoyStickController(props: JoyStickControllerProps = {isHandStickActive : false}): JSX.Element {
   const [connectedGamepad, setConnectedGamepad] = useState<Gamepad | null>(
     null
   );
@@ -11,16 +15,18 @@ function JoyStickController(): JSX.Element {
     angular: 0,
   });
 
+  const { isHandStickActive } = props;
   useLayoutEffect(() => {
     (function checkAvailableGamePads() {
       requestAnimationFrame(checkAvailableGamePads);
       const newGamepad = navigator.getGamepads()[0];
       if (!newGamepad) return;
 
-      console.log(newGamepad.axes);
+      const linearIndex = isHandStickActive ? 1 : 3, angularIndex = isHandStickActive ? 0 : 2;
+      console.log(isHandStickActive, newGamepad.axes);
       setMovementState({
-        linear: -parseFloat(newGamepad.axes[3].toFixed(2)),
-        angular: parseFloat(newGamepad.axes[2].toFixed(2)),
+        linear: -parseFloat(newGamepad.axes[linearIndex].toFixed(2)),
+        angular: parseFloat(newGamepad.axes[angularIndex].toFixed(2)),
       });
 
       setConnectedGamepad(newGamepad);
